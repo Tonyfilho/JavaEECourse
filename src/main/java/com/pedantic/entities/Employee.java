@@ -43,7 +43,7 @@ public class Employee extends AbstractEntity {
 
 
     @NotEmpty(message = "Name cannot be empty")
-    @Basic
+    @Basic /**Esta anotação para ser Mapeada na DB como do tipo BASIC, Ex: Tipo: Long, String, Int , ela é OPCIONAL pois já é Default*/
     private String fullName;
 
     @Past(message = "Date of birth must be in the past")

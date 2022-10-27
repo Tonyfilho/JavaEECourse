@@ -18,14 +18,15 @@ public class Department extends AbstractEntity {
     public static final String LIST_DEPARTMENTS = "Department.listDepartments";
 
 
-    @NotEmpty(message = "Department name must be set")
+    @NotEmpty(message = "Department name must be set") /**@NotEmpty é FieldAcess é um Provider de acesso ao campo */
 
     private String departmentName;
 
     @OneToMany(mappedBy = "department")
     private Collection<Employee> employees = new ArrayList<>();
 
-    @Transient
+    @Transient /** @Transient,Quando esta ENTITY for MAPEADA, diga ao CDI p/ Não MAPEAR este campo, será um Objeto Java Local desta class e não Um Atributo da Entidade a ser Mapeada,
+    Este no Scopo em Provaider or RunTIME não  vai existir */
     private String departmentCode;
 
 
