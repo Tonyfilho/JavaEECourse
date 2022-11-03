@@ -9,7 +9,7 @@ public abstract class AbstractEntity implements Serializable {
 
 
     @Id // Igual ao do Spring  Identifica e fala para Mapeamento que é um ID da table
-    @GeneratedValue(strategy = GenerationType.AUTO) // Iqual ao do Spring
+    @GeneratedValue(strategy = GenerationType.AUTO) // Iqual ao do Spring, Só deve ser usado AUTo de development, em Prod. tem q ser usado IDENTITY
     protected Long id;
 
     protected String userEmail;

@@ -28,12 +28,10 @@ import javax.validation.constraints.PastOrPresent;
 @NamedQuery(name = Employee.FIND_BY_ID, query = "select e from Employee e where e.id = :id and e.userEmail = :email")
 @NamedQuery(name = Employee.FIND_BY_NAME, query = "select e from Employee e where e.fullName = :name and e.userEmail = :email")
 @NamedQuery(name = Employee.LIST_EMPLOYEES, query = "select  e from Employee e where e.userEmail = :email order by e.fullName")
-@NamedQuery(name = Employee.FIND_PAST_PAYSLIP_BY_ID,
-        query = "select p from Employee e join e.pastPayslips p where e.id = :employeeId and e.userEmail =:email and p.id =:payslipId and p.userEmail = :email")
+@NamedQuery(name = Employee.FIND_PAST_PAYSLIP_BY_ID, query = "select p from Employee e join e.pastPayslips p where e.id = :employeeId and e.userEmail =:email and p.id =:payslipId and p.userEmail = :email")
 @NamedQuery(name = Employee.GET_PAST_PAYSLIPS, query = "select p from Employee e inner join e.pastPayslips p where e.id = :employeeId and e.userEmail=:email")
-@Table(name = "Employee", schema = "HR") /**A Table @notation para Mapear a relação da Tabela da DB com a sua ENTITY */
+@Table(name = "Employee", schema = "HR") /** A Table @notation para Mapear a relação da Tabela da DB com a sua ENTITY */
 public class Employee extends AbstractEntity {
-
 
     public static final String FIND_BY_ID = "Employee.findById";
     public static final String FIND_BY_NAME = "Employee.findByName";
@@ -41,14 +39,16 @@ public class Employee extends AbstractEntity {
     public static final String FIND_PAST_PAYSLIP_BY_ID = "Employee.findPastPayslipById";
     public static final String GET_PAST_PAYSLIPS = "Employee.getPastPayslips";
 
-
     @NotEmpty(message = "Name cannot be empty")
-    @Basic /**Esta anotação para ser Mapeada na DB como do tipo BASIC, Ex: Tipo: Long, String, Int , ela é OPCIONAL pois já é Default*/
+    @Basic /**
+            * Esta anotação para ser Mapeada na DB como do tipo BASIC, Ex: Tipo: Long,
+            * String, Int , ela é OPCIONAL pois já é Default
+            */
     private String fullName;
 
     @Past(message = "Date of birth must be in the past")
     @JsonbDateFormat(value = "yyyy-MM-dd")
-    private LocalDate dateOfBirth; //yyyy-MM-dd
+    private LocalDate dateOfBirth; // yyyy-MM-dd
 
     @NotNull(message = "Basic salary must be set")
     private BigDecimal basicSalary;
@@ -64,7 +64,6 @@ public class Employee extends AbstractEntity {
     @OneToMany
     private Set<Employee> subordinates = new HashSet<>();
 
-
     @Enumerated(EnumType.STRING)
     private EmploymentType employmentType;
 
@@ -73,27 +72,46 @@ public class Employee extends AbstractEntity {
 
     private int age;
 
-    @OneToMany
+    @OneToMany /**
+                * 1 instancia de Employee, irá receber Muitas Instancias de Allowance.
+                * Lá em Allowance NÃO temos anotação @ManyToOne na Entidade Allowance onde é
+                * UNIDIRECIONAL.
+                * OBs: os Dados tem de ser armazenados em uma Collection, array ou Set ou Map
+                * Allowance*************************************************************** la
+                * na DB teremos uma foreingKey associada na Tabela
+                * Department
+                */
     private Set<Allowance> employeeAllowances = new HashSet<>();
 
-    @OneToOne
+    @OneToOne /**
+               * 1 Instancia de Employee tem relação com 1 instancia de Payslip
+               */
+    @JoinColumn(name = "CURRENT_PAYSLIP_ID") /**Na Table Employee teremos uma Unique Constraint, ou seja Cada vez que a Tabela PAYSLIP criar 1 item, teremos 1 Registro dentro de Employee.CurrentPayslip */
     private Payslip currentPayslip;
 
     @OneToMany
     private Collection<Payslip> pastPayslips = new ArrayList<>();
 
-
-    @ManyToOne
+    @ManyToOne /**
+                * Esta @anotação diz: Envio Muitas instancia de Employee serão enviados
+                * colocará tudo em uma unica
+                * instancias de Department
+                */
+    @JoinColumn(name = "DEPT_ID") /**
+                                   * a @notação vai Juntar as Colunas da PrimaryKey de Employee com ForeingKey de
+                                   * Department com nome DEPT_ID
+                                   */
     private Department department;
+
     @Lob
     private byte[] picture;
-
 
     @PrePersist
     private void init() {
         this.age = Period.between(dateOfBirth, LocalDate.now()).getYears();
     }
 
+    /***************************************** GETs and SETs *************** */
     public Employee getReportsTo() {
         return reportsTo;
     }
