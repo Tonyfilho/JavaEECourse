@@ -77,17 +77,34 @@ public class Employee extends AbstractEntity {
                 * Lá em Allowance NÃO temos anotação @ManyToOne na Entidade Allowance onde é
                 * UNIDIRECIONAL.
                 * OBs: os Dados tem de ser armazenados em uma Collection, array ou Set ou Map
-                * Allowance*************************************************************** la
-                * na DB teremos uma foreingKey associada na Tabela
+                * na DB teremos uma foreingKey de Department associada na Tabela Employee
                 * Department
                 */
     private Set<Allowance> employeeAllowances = new HashSet<>();
 
     @OneToOne /**
-               * 1 Instancia de Employee tem relação com 1 instancia de Payslip
+               * 1 Instancia de Employee tem relação com 1 instancia de Payslip, por Somente
+               * ter aqui a @notação, esta relação será INIDIRECIONAL, teremos uma ForeingKey
+               * the Allowance na tabela Employee
                */
-    @JoinColumn(name = "CURRENT_PAYSLIP_ID") /**Na Table Employee teremos uma Unique Constraint, ou seja Cada vez que a Tabela PAYSLIP criar 1 item, teremos 1 Registro dentro de Employee.CurrentPayslip */
+    @JoinColumn(name = "CURRENT_PAYSLIP_ID") /**
+                                              * Na Table Employee teremos uma Unique Constraint, ou seja Cada vez que a
+                                              * Tabela PAYSLIP criar 1 item, teremos 1 Registro dentro de
+                                              * Employee.CurrentPayslip,
+                                              */
     private Payslip currentPayslip;
+
+    @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY) /**
+                                      * 1 Instancia de Employee tem relação com 1 instancia de Payslip, mas agora
+                                      * será Bidirecional, temos uma Foreingkey de ParkingSpace em Employee E uma
+                                      * ForeingKey de Employee em ParkingSpace, pois lá na entidade ParkingSpace
+                                      * teremos a @notação @OneToOne TB.
+                                      * fetch = FetchType.LAZY  estou dizendo q o FETCH é LAZY, só irá buscar quando houver um Resquest 
+                                      * este já o DEFAULT, quando não é informado. 
+                                      */
+    private ParkingSpace parkingSpace;
+
+
 
     @OneToMany
     private Collection<Payslip> pastPayslips = new ArrayList<>();
@@ -103,6 +120,15 @@ public class Employee extends AbstractEntity {
                                    */
     private Department department;
 
+    @ManyToMany(mappedBy = "employees") /**
+                                         * Nesta Relação, tenho Muitas Instancias de Employee sendo Recebidas aqui nesta
+                                         * Entidade, e por sua vez, Employee irá tb receber muitas Instancias da
+                                         * Entidade Project.
+                                         * NOTE: mappedBy = "employees" , estou dizendo que a Entidade PROJECT é o OWNER
+                                         * do relacionamento, é conceito de JOINTABLEs
+                                         */
+    private Collection<Project> projects;
+
     @Lob
     private byte[] picture;
 
@@ -112,6 +138,23 @@ public class Employee extends AbstractEntity {
     }
 
     /***************************************** GETs and SETs *************** */
+
+    public ParkingSpace getParkingSpace() {
+        return parkingSpace;
+    }
+
+    public Collection<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(Collection<Project> projects) {
+        this.projects = projects;
+    }
+
+    public void setParkingSpace(ParkingSpace parkingSpace) {
+        this.parkingSpace = parkingSpace;
+    }
+
     public Employee getReportsTo() {
         return reportsTo;
     }
