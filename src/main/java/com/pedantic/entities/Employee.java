@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import javax.ejb.Local;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -70,6 +69,13 @@ public class Employee extends AbstractEntity {
     @Embedded
     private Address address;
 
+    @ElementCollection /*
+                        * Esta é a forma de Map uma collection em uma Entidade, com isto é criado uma
+                        * segunda tabela a primarykey de Employee será uma referencia do  objeto em forma de foreingKey.
+                        */
+     @CollectionTable(name = "QUALIFICATION", joinColumns =  @JoinColumn(name = "EMP_ID "))/* Custamizando a Collection table com nomes da tabela */
+    private Collection<Qualifications> qualifications = new ArrayList<>();
+   
     private int age;
 
     @OneToMany /**
@@ -92,19 +98,21 @@ public class Employee extends AbstractEntity {
                                               * Tabela PAYSLIP criar 1 item, teremos 1 Registro dentro de
                                               * Employee.CurrentPayslip,
                                               */
-    private Payslip currentPayslip;
+    private Payslip currentPayslip ;
 
     @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY) /**
-                                      * 1 Instancia de Employee tem relação com 1 instancia de Payslip, mas agora
-                                      * será Bidirecional, temos uma Foreingkey de ParkingSpace em Employee E uma
-                                      * ForeingKey de Employee em ParkingSpace, pois lá na entidade ParkingSpace
-                                      * teremos a @notação @OneToOne TB.
-                                      * fetch = FetchType.LAZY  estou dizendo q o FETCH é LAZY, só irá buscar quando houver um Resquest 
-                                      * este já o DEFAULT, quando não é informado. 
-                                      */
+                                                              * 1 Instancia de Employee tem relação com 1 instancia de
+                                                              * Payslip, mas agora
+                                                              * será Bidirecional, temos uma Foreingkey de ParkingSpace
+                                                              * em Employee E uma
+                                                              * ForeingKey de Employee em ParkingSpace, pois lá na
+                                                              * entidade ParkingSpace
+                                                              * teremos a @notação @OneToOne TB.
+                                                              * fetch = FetchType.LAZY estou dizendo q o FETCH é LAZY,
+                                                              * só irá buscar quando houver um Resquest
+                                                              * este já o DEFAULT, quando não é informado.
+                                                              */
     private ParkingSpace parkingSpace;
-
-
 
     @OneToMany
     private Collection<Payslip> pastPayslips = new ArrayList<>();
@@ -127,7 +135,7 @@ public class Employee extends AbstractEntity {
                                          * NOTE: mappedBy = "employees" , estou dizendo que a Entidade PROJECT é o OWNER
                                          * do relacionamento, é conceito de JOINTABLEs
                                          */
-    private Collection<Project> projects;
+    private Collection<Project> projects = new ArrayList<>();
 
     @Lob
     private byte[] picture;

@@ -5,6 +5,7 @@ import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @NamedQuery(name = Department.FIND_BY_ID, query = "select d from Department d where d.id = :id and d.userEmail = :email")
@@ -27,7 +28,10 @@ public class Department extends AbstractEntity {
                                          * array ou Set ou Map
                                          * Para Cada Employee la na DB teremos uma foreingKey associada na Tabela Department
                                          */
-    private Collection<Employee> employees = new ArrayList<>();
+                                         /**
+                                          * A LIST ordenará os dados pela PrimaKey
+                                          */
+    private List<Employee> employees = new ArrayList<>();
     
 
     @Transient /**
@@ -37,6 +41,12 @@ public class Department extends AbstractEntity {
                 *                   Este no Scopo em Provaider or RunTIME não vai existir
                 */
     private String departmentCode;
+
+
+
+
+
+
 
     public String getDepartmentCode() {
         return departmentCode;
@@ -54,11 +64,11 @@ public class Department extends AbstractEntity {
         this.departmentName = departmentName;
     }
 
-    public Collection<Employee> getEmployees() {
+    public List<Employee> getEmployees() {
         return employees;
     }
 
-    public void setEmployees(Collection<Employee> employees) {
+    public void setEmployees(List<Employee> employees) {
         this.employees = employees;
     }
 }
