@@ -11,7 +11,9 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.persistence.*;
@@ -117,6 +119,16 @@ public class Employee extends AbstractEntity {
     @OneToMany
     private Collection<Payslip> pastPayslips = new ArrayList<>();
 
+
+    @ElementCollection /**Todo Map ja recebe por DEFAULT esta @anotação, mesmo que não declarada */
+    @CollectionTable(name = "EMP_PHONE_NUMBERS")
+    @MapKeyColumn(name = "PHONE_TYPE")
+    @Column(name = "PHONE_NUMBER")
+    @MapKeyEnumerated(EnumType.STRING)
+    private Map<PhoneType,String> employeePhoneMumbers = new HashMap<>(); /**O Map precisa ter 2 argumentos, a KEY e Objeto */
+
+
+
     @ManyToOne /**
                 * Esta @anotação diz: Envio Muitas instancia de Employee serão enviados
                 * colocará tudo em uma unica
@@ -146,6 +158,18 @@ public class Employee extends AbstractEntity {
     }
 
     /***************************************** GETs and SETs *************** */
+
+
+    
+
+    
+    public Map<PhoneType, String> getEmployeePhoneMumbers() {
+        return employeePhoneMumbers;
+    }
+    
+    public void setEmployeePhoneMumbers(Map<PhoneType, String> employeePhoneMumbers) {
+        this.employeePhoneMumbers = employeePhoneMumbers;
+    }
 
     public ParkingSpace getParkingSpace() {
         return parkingSpace;
