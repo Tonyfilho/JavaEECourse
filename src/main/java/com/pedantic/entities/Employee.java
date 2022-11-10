@@ -102,7 +102,7 @@ public class Employee extends AbstractEntity {
                                               */
     private Payslip currentPayslip ;
 
-    @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY) /**
+    @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST , CascadeType.REMOVE}) /**
                                                               * 1 Instancia de Employee tem relação com 1 instancia de
                                                               * Payslip, mas agora
                                                               * será Bidirecional, temos uma Foreingkey de ParkingSpace
@@ -113,10 +113,12 @@ public class Employee extends AbstractEntity {
                                                               * fetch = FetchType.LAZY estou dizendo q o FETCH é LAZY,
                                                               * só irá buscar quando houver um Resquest
                                                               * este já o DEFAULT, quando não é informado.
+                                                              * cascade = CascadeType.PERSIST que dizer, q tudo neste relacionamento OnetoOne será cascateado
+                                                              * para ParkingSpace, este o conceito de  CASCADE
                                                               */
     private ParkingSpace parkingSpace;
 
-    @OneToMany
+    @OneToMany // todas as relações existem o conceito de CASCADE
     private Collection<Payslip> pastPayslips = new ArrayList<>();
 
 

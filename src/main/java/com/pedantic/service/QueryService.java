@@ -38,6 +38,14 @@ public class QueryService {
 
     }
 
+    /*FindById */
+    public Department findByIdDepartment(Long id ) {
+        return entityManager.find(Department.class, id);
+    }
+
+    public Employee findEmployeeById(long id) {
+        return entityManager.find(Employee.class, id);
+    }
     
     public List<Employee> getEmployees() {
         return null;

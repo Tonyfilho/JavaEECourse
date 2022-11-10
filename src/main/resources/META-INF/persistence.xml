@@ -1,8 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <!-- persistence-unit name="pu" é NAME do Persistence, se houver 1, não precisa por, caso haja mais de Persistence é Obrigatorio  -->
+  <!--  transaction-type="JTA" JTA Este é o Padrão, é como se dissemos, CDI Crie o Container e Injete a Persistence aqui, e resolva esta injeção, o CDI irá controlar tudo -->
   <persistence-unit name="pu" transaction-type="JTA">
-   <jta-data-source>java:app/Payroll/MyDS</jta-data-source>
+
+    <!-- jta-data-source É onde contem a  configuração do servidor de aplicação com o servidor da DataBase, JavaEE ira fz tudo em forma Abstrata -->
+    <!-- Dentro do Arquivo PersistenceService.java Ou dentro Web.xml poderá encontrar a configuração -->
+    <!-- java:app é um SCOPO: Que dizer que somente desta aplicação, é Default  -->
+    <!-- java:module é um SCOPO:  Que dizer que somente deste Modulo -->
+    <!-- java:globalé um SCOPO: Que dizer que é disponivel entre aplicações -->
+    <!-- Payroll/MyDS é nome da DataSource que lá PersistenceService.java teremos a @notação  @DataSourceDefinition(...) -->
+    <jta-data-source>java:app/Payroll/MyDS</jta-data-source>
+
+
+    <!--Exclude-unlistes-class=false que dizer CDI todas as classe com em XML ou METADATA Ex: @Entity or @MappedSuperclass é para ser escaniada pelo Persistence Unit  -->
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
+
+    <!-- Deployment Properties -->
+    <!-- property É um DataBase Action -->
+    <!-- name="javax.persistence.schema-generation.DATABASE.action" é Padrão  do JavaEE-->
+
+    <!-- name="javax.persistence.schema-generation.SCRIPTS.action Quer dizer: Quando a aplicação for feita o Deploy crie um SCRIPT -->
+    <!-- name="javax.persistence.schema-generation.SCRIPTS.action.Drop-Target VALUE:"file:///c:scripts/drop.dll " Quer dizer: Quando a aplicação for feita o Deploy crie um SCRIPT e SALVE neste Local Value -->
+
+    <!-- value="drop-and-create" Diz para Destruir e Criar uma nova Squema  caso ele já exista, Baseado nas Entidades desta Aplicação a cada  Deployment -->
+    <!-- Value="none", que dizer Não faça nada com a DataBase, Remover a TAG <property> é o mesmo que por None-->
+    <!-- Value="create" que dizer crie uma nova Squema Baseado nas nas Entidades desta Aplicação -->
+    <!-- Value="drop" -->
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="drop-and-create" />
     </properties>

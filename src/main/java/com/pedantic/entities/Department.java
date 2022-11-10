@@ -8,6 +8,12 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
+/*Static QUERYS */
+/** PJQL irá comparar os nomes das Querys  @NamedQuery(name = Nome da Query), esta modelo é o STATIC QUERY*/
+
+/*DYNAMIC QUERYS  */
+/** @NamedQuery(name = public static final String FIND_BY_ID , query = "Nome da Query") */
+
 @NamedQuery(name = Department.FIND_BY_ID, query = "select d from Department d where d.id = :id and d.userEmail = :email")
 @NamedQuery(name = Department.FIND_BY_NAME, query = "select d from Department d where d.departmentName = :name and d.userEmail = :email")
 @NamedQuery(name = Department.LIST_DEPARTMENTS, query = "select d from Department d where  d.userEmail = :email")
