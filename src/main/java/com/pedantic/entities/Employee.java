@@ -31,10 +31,16 @@ import javafx.scene.control.PasswordField;
 /**Criando NamedQuery para PakingSpace employee relacionamento OneToOne LazyLoad */
 @NamedQuery(name = Employee.GET_ALL_PARKING_SPACE, query = "select e.getParkingSpace.parkingLotNumber from Employee e")
 
-/**Criando NamedQuery para employee name and Salary
+/**Criando NamedQuery para employee name and Salary, COMBINE EXPRESSION
  * Select: Expression e.fullName, e.basicSalary, isto será uma Coleção Array  de  Objeto, por serem Tipos diferentes, 1º string o 2º BigDecimal
  */
 @NamedQuery(name = Employee.EMPLOYEE_PROJECTION, query = "select e.fullName, e.basicSalary from Employee e")
+
+/**Criando NamedQuery para employee name and Salary, CONSTRUCTOR   EXPRESSION 
+ * temos que passar o nome e caminho da class e o construtor: com.pedantic.entities.EmployeeDetails()
+ * Select: Expression e.fullName, e.basicSalary, isto será uma Coleção Array  de  Objeto, por serem Tipos diferentes, 1º string o 2º BigDecimal
+ */
+@NamedQuery(name = Employee.EMPLOYEE_CONSTRUCTOR_PROJECTION, query ="select new com.pedantic.entities.EmployeeDetails(e.fullName, e.basicSalary, e.department.departmentName) from Employee e")
 
 
 
@@ -54,7 +60,9 @@ public class Employee extends AbstractEntity {
     /**Criando NamedQuery para PakingSpace employee relacionamento OneToOne LazyLoad */
     public static final String GET_ALL_PARKING_SPACE = "Employee.getAllParkingSpaces";
     /**Criando NamedQuery para employee name and Salary */
-    public static final String EMPLOYEE_PROJECTION = "Employee.nameAndSalaryProjection";
+    public static final String EMPLOYEE_PROJECTION = "Employee.nameAndSalaryProjection";    
+    /**Criando NamedQuery para employee name and Salary  and Department */
+    public static final String EMPLOYEE_CONSTRUCTOR_PROJECTION = "Employee.nameAndSalaryAndDepartmentNameProjection";
 
 
 

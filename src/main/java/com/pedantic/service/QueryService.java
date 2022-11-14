@@ -12,6 +12,7 @@ import javax.persistence.TypedQuery;
 
 import com.pedantic.entities.Department;
 import com.pedantic.entities.Employee;
+import com.pedantic.entities.EmployeeDetails;
 import com.pedantic.entities.ParkingSpace;
 
 @Stateless /**
@@ -86,8 +87,14 @@ public class QueryService {
     public Collection<Object[]> GetEmployeeProjection() {
         return entityManager.createQuery(Employee.EMPLOYEE_PROJECTION, Object[].class).getResultList();
     }
-
-
+    
+    /**
+     * Foi criado uma @QueryName EMPLOYEE_CONSTRUCTOR_PROJECTION, que Retornará uma
+     * Collection de Array de Objeto usando construtor da class
+     */
+    public List<EmployeeDetails>  getEmployeeProjectionDetails() {
+      return entityManager.createQuery(Employee.EMPLOYEE_CONSTRUCTOR_PROJECTION, EmployeeDetails.class).getResultList();
+    }
     
 
     /* FindById */
