@@ -14,11 +14,20 @@ import java.util.List;
 /*DYNAMIC QUERYS  */
 /** @NamedQuery(name = public static final String FIND_BY_ID , query = "Nome da Query") */
 
+/* Vou criar uma @NAMEQuery  GET_DEPARTMENT_LIST que será usada em la na Class QUERYSERVER  */
+@NamedQuery(name =  Department.GET_DEPARTMENT_LIST, query = "select d from Department d")
+
+/**Path Expression, serve para NAVEGAR por cada campo da Entidade */
+@NamedQuery(name = Department.GET_DEPARTMENT_NAMES, query = "select d.departmentName from Department d")
+
 @NamedQuery(name = Department.FIND_BY_ID, query = "select d from Department d where d.id = :id and d.userEmail = :email")
 @NamedQuery(name = Department.FIND_BY_NAME, query = "select d from Department d where d.departmentName = :name and d.userEmail = :email")
 @NamedQuery(name = Department.LIST_DEPARTMENTS, query = "select d from Department d where  d.userEmail = :email")
 @Access(AccessType.FIELD)
 public class Department extends AbstractEntity {
+
+    public static final String GET_DEPARTMENT_LIST = "Department.getAllDepartments";
+    public static final String GET_DEPARTMENT_NAMES = "Department.getDeptNames";
 
     public static final String FIND_BY_ID = "Department.findById";
     public static final String FIND_BY_NAME = "Department.findByName";

@@ -22,10 +22,22 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.PastOrPresent;
 
+import javafx.scene.control.PasswordField;
+
 /**
  * @author Seeraj
  */
 @Entity
+/**Criando NamedQuery para PakingSpace employee relacionamento OneToOne LazyLoad */
+@NamedQuery(name = Employee.GET_ALL_PARKING_SPACE, query = "select e.getParkingSpace.parkingLotNumber from Employee e")
+
+/**Criando NamedQuery para employee name and Salary
+ * Select: Expression e.fullName, e.basicSalary, isto será uma Coleção Array  de  Objeto, por serem Tipos diferentes, 1º string o 2º BigDecimal
+ */
+@NamedQuery(name = Employee.EMPLOYEE_PROJECTION, query = "select e.fullName, e.basicSalary from Employee e")
+
+
+
 @NamedQuery(name = Employee.FIND_BY_ID, query = "select e from Employee e where e.id = :id and e.userEmail = :email")
 @NamedQuery(name = Employee.FIND_BY_NAME, query = "select e from Employee e where e.fullName = :name and e.userEmail = :email")
 @NamedQuery(name = Employee.LIST_EMPLOYEES, query = "select  e from Employee e where e.userEmail = :email order by e.fullName")
@@ -39,6 +51,12 @@ public class Employee extends AbstractEntity {
     public static final String LIST_EMPLOYEES = "Employee.listEmployees";
     public static final String FIND_PAST_PAYSLIP_BY_ID = "Employee.findPastPayslipById";
     public static final String GET_PAST_PAYSLIPS = "Employee.getPastPayslips";
+    /**Criando NamedQuery para PakingSpace employee relacionamento OneToOne LazyLoad */
+    public static final String GET_ALL_PARKING_SPACE = "Employee.getAllParkingSpaces";
+    /**Criando NamedQuery para employee name and Salary */
+    public static final String EMPLOYEE_PROJECTION = "Employee.nameAndSalaryProjection";
+
+
 
     @NotEmpty(message = "Name cannot be empty")
     @Basic /**
