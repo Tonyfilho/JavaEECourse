@@ -28,6 +28,36 @@ import javafx.scene.control.PasswordField;
  * @author Seeraj
  */
 @Entity
+/**
+ * LIKE Operator
+ */
+
+
+
+
+/**BETWEEN  Operator
+ * Limitaremos o que virá na QUERY usando Between, combinaremos 2 limitadores
+ */
+@NamedQuery(name= Employee.EMPLOYEE_SALARY_BOUND , query = "select e from Employee e WHERE e.basicSalary BETWEEN :lowerBound AND :upperBound")
+
+
+/**WHERE Clause, são paramentros usados para FILTRAR, são chamado de PARAMITERS 
+ * Ex: " Maior que, Iqual que ...."
+ * OBS: ? é aqui um paramentro da NamedQuery, neste caso ? ou podemos passar a propriedade
+*/
+@NamedQuery(name= Employee.GET_WHERE_CLAUSE_EMPLOYEE_PARAMITERS_ALLOWANCES , query = "select distinct al from Employee e join  e.employeeAllowances al WHERE Al.allowance.Amount > :greaterThanValue")
+
+/**Criando NamedQuery com JOIN, e trazendo so que tem em outra Entidade
+ * OBS: temos agora 2 Var o E e o AL
+ * AllWances é uma SET ou seja uma COLLECTION
+ * */ 
+@NamedQuery(name= Employee.EMPLOYEE_CONSTRUCTOR_PROJECTION_SET, query = "select distinct al from Employee e join  e.employeeAllowances al")
+
+/**
+ * Por um MAP um tipo de COLLECTION com KEY e VALUE
+ * */ 
+@NamedQuery(name= Employee.EMPLOYEE_CONSTRUCTOR_MAP, query = "select e.fullName, KEY(p), VALUE(p) from Employee e join  e.employeePhoneNumbers p")
+
 /**Criando NamedQuery para PakingSpace employee relacionamento OneToOne LazyLoad */
 @NamedQuery(name = Employee.GET_ALL_PARKING_SPACE, query = "select e.getParkingSpace.parkingLotNumber from Employee e")
 
@@ -44,6 +74,9 @@ import javafx.scene.control.PasswordField;
 
 
 
+
+
+
 @NamedQuery(name = Employee.FIND_BY_ID, query = "select e from Employee e where e.id = :id and e.userEmail = :email")
 @NamedQuery(name = Employee.FIND_BY_NAME, query = "select e from Employee e where e.fullName = :name and e.userEmail = :email")
 @NamedQuery(name = Employee.LIST_EMPLOYEES, query = "select  e from Employee e where e.userEmail = :email order by e.fullName")
@@ -51,7 +84,7 @@ import javafx.scene.control.PasswordField;
 @NamedQuery(name = Employee.GET_PAST_PAYSLIPS, query = "select p from Employee e inner join e.pastPayslips p where e.id = :employeeId and e.userEmail=:email")
 @Table(name = "Employee", schema = "HR") /** A Table @notation para Mapear a relação da Tabela da DB com a sua ENTITY */
 public class Employee extends AbstractEntity {
-
+    /**Os Nomes das Querys */
     public static final String FIND_BY_ID = "Employee.findById";
     public static final String FIND_BY_NAME = "Employee.findByName";
     public static final String LIST_EMPLOYEES = "Employee.listEmployees";
@@ -63,6 +96,16 @@ public class Employee extends AbstractEntity {
     public static final String EMPLOYEE_PROJECTION = "Employee.nameAndSalaryProjection";    
     /**Criando NamedQuery para employee name and Salary  and Department */
     public static final String EMPLOYEE_CONSTRUCTOR_PROJECTION = "Employee.nameAndSalaryAndDepartmentNameProjection";
+    /**Criando NamedQuery para employee name and Salary  and Department Usando COLLECTION SET */
+    public static final String EMPLOYEE_CONSTRUCTOR_PROJECTION_SET = "Employee.nameAndSalaryAndDepartmentNameProjection";
+    /**Criando NamedQuery para employee name and Salary  and Department Usando COLLECTION MAP */
+    public static final String EMPLOYEE_CONSTRUCTOR_MAP = "Employee.mapEmployee";   
+    /**Criando NamedQuery WHERE com PARAMITERS*/
+    public static final String GET_WHERE_CLAUSE_EMPLOYEE_PARAMITERS_ALLOWANCES = "Employee.getAllowances";
+    /** NamedQuery com limitadores */
+    public static final String EMPLOYEE_SALARY_BOUND = "EmployeeSalaryBound";
+
+    
 
 
 

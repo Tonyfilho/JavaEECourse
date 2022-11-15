@@ -1,7 +1,9 @@
 package com.pedantic.service;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -10,6 +12,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import com.pedantic.entities.Allowance;
 import com.pedantic.entities.Department;
 import com.pedantic.entities.Employee;
 import com.pedantic.entities.EmployeeDetails;
@@ -87,15 +90,50 @@ public class QueryService {
     public Collection<Object[]> GetEmployeeProjection() {
         return entityManager.createQuery(Employee.EMPLOYEE_PROJECTION, Object[].class).getResultList();
     }
-    
+
     /**
      * Foi criado uma @QueryName EMPLOYEE_CONSTRUCTOR_PROJECTION, que Retornará uma
      * Collection de Array de Objeto usando construtor da class
      */
-    public List<EmployeeDetails>  getEmployeeProjectionDetails() {
-      return entityManager.createQuery(Employee.EMPLOYEE_CONSTRUCTOR_PROJECTION, EmployeeDetails.class).getResultList();
+    public List<EmployeeDetails> getEmployeeProjectionDetails() {
+        return entityManager.createQuery(Employee.EMPLOYEE_CONSTRUCTOR_PROJECTION, EmployeeDetails.class)
+                .getResultList();
     }
-    
+
+    /**
+     * Foi criado uma @QueryName que Recebe PARAMENTRO (name=
+     * Employee.GET_WHERE_CLAUSE_EMPLOYEE_PARAMITERS_ALLOWANCES que receberá um
+     * parametro
+     */
+    public Collection<Allowance> getEmployeeAllowance(BigDecimal greaterThanValue) {
+        return entityManager.createQuery(Employee.GET_WHERE_CLAUSE_EMPLOYEE_PARAMITERS_ALLOWANCES, Allowance.class)
+                .setParameter("greaterThanValue", greaterThanValue).getResultList();
+    }
+
+    /**
+     * Foi criado uma @QueryName limita o que virá com Minimo e Maximo
+     */
+    public Collection<Employee> filterEmployeesSalary(BigDecimal lowerBound, BigDecimal upperBound) {
+        return entityManager.createQuery(Employee.EMPLOYEE_SALARY_BOUND, Employee.class)
+                .setParameter("lowerBound", lowerBound).setParameter("upperBound", upperBound).getResultList();
+    }
+
+    /**
+     * Esta sendo Criando Localmente a Query com o LIKE
+     */
+    public Collection<Employee> filterEmployees(String pattern) {
+        return entityManager.createQuery("SELECT e FROM Employee e where e.fullName LIKE :filter", Employee.class)
+                .setParameter("filter", pattern).getResultList(); //No Paramentro posso passar um Nome Ex. joão, ele buscará todos q tem João
+    }
+
+    /**
+     *  Esta sendo Criando Localmente a Query com SUBQuerys
+     * (SELECT MAX(emp.basicSalary) FROM Employee emp).
+     * OBS: foi usando SINGLE .getSingleResult()
+     */
+    public Employee getEmployeeWithHighestSalary() {
+        return entityManager.createQuery("SELECT e FROM EMPLOYEE e WHERE e.basicSalary = (SELECT MAX(emp.basicSalary) FROM Employee emp)", Employee.class).getSingleResult();
+    }
 
     /* FindById */
     public Department findByIdDepartment(Long id) {

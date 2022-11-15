@@ -8,6 +8,18 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
+/**JPQL
+ * select d from Department d where d.departmentName = :name and d.userEmail = :email
+ * SELECT   <select Expression> é o que queremos, os Atributos da Entidade
+ * FROM     <from clause> é a Entidade
+ * WHERE    <where clause> é as Opções de filtro
+ * ORDER BY <order by clause>
+ * 
+ * 
+ */
+
+
+
 /*Static QUERYS */
 /** PJQL irá comparar os nomes das Querys  @NamedQuery(name = Nome da Query), esta modelo é o STATIC QUERY*/
 
