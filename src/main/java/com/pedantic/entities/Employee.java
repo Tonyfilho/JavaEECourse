@@ -17,10 +17,12 @@ import java.util.Map;
 import java.util.Set;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.persistence.*;
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
 
 import javafx.scene.control.PasswordField;
 
@@ -114,6 +116,7 @@ public class Employee extends AbstractEntity {
             * Esta anotação para ser Mapeada na DB como do tipo BASIC, Ex: Tipo: Long,
             * String, Int , ela é OPCIONAL pois já é Default
             */
+    @Size( min = 6, max = 40 ,message = "Min Size Name is 6 caracters") /**Pode ser usando com Maximo e Minimo */
     private String fullName;
 
     @Past(message = "Date of birth must be in the past")
@@ -147,6 +150,7 @@ public class Employee extends AbstractEntity {
      @CollectionTable(name = "QUALIFICATION", joinColumns =  @JoinColumn(name = "EMP_ID "))/* Custamizando a Collection table com nomes da tabela */
     private Collection<Qualifications> qualifications = new ArrayList<>();
    
+    @DecimalMax(value = "70") /**Com esta anotação, não permitirar intrudução de Numeros maiores de 70 */
     private int age;
 
     @OneToMany /**
@@ -223,7 +227,18 @@ public class Employee extends AbstractEntity {
     @Lob
     private byte[] picture;
 
-    @PrePersist
+    @PrePersist /** São LIFECYCLEs com funcões de CALLBACKs
+    * @PostPersist
+    * @PreUpdate
+    * @PostUpdate
+    * @PostLoad
+    * Que diz para este campo ser persistido na DB
+    * no RunTime este Metodo ser Pre Percistido na DB
+    */
+    @PostPersist
+    @PreUpdate
+    @PostUpdate
+    @PostLoad
     private void init() {
         this.age = Period.between(dateOfBirth, LocalDate.now()).getYears();
     }

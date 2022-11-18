@@ -17,6 +17,7 @@ import com.pedantic.entities.Department;
 import com.pedantic.entities.Employee;
 import com.pedantic.entities.EmployeeDetails;
 import com.pedantic.entities.ParkingSpace;
+import com.pedantic.entities.Project;
 
 @Stateless /**
             * a @notação @Stateless tem a mesma função Scope @Request, onde cada instancia
@@ -123,16 +124,147 @@ public class QueryService {
      */
     public Collection<Employee> filterEmployees(String pattern) {
         return entityManager.createQuery("SELECT e FROM Employee e where e.fullName LIKE :filter", Employee.class)
-                .setParameter("filter", pattern).getResultList(); //No Paramentro posso passar um Nome Ex. joão, ele buscará todos q tem João
+                .setParameter("filter", pattern).getResultList(); // No Paramentro posso passar um Nome Ex. joão, ele
+                                                                  // buscará todos q tem João
     }
 
     /**
-     *  Esta sendo Criando Localmente a Query com SUBQuerys
+     * Esta sendo Criando Localmente a Query com SUBQuerys
      * (SELECT MAX(emp.basicSalary) FROM Employee emp).
      * OBS: foi usando SINGLE .getSingleResult()
      */
     public Employee getEmployeeWithHighestSalary() {
-        return entityManager.createQuery("SELECT e FROM EMPLOYEE e WHERE e.basicSalary = (SELECT MAX(emp.basicSalary) FROM Employee emp)", Employee.class).getSingleResult();
+        return entityManager.createQuery(
+                "SELECT e FROM EMPLOYEE e WHERE e.basicSalary = (SELECT MAX(emp.basicSalary) FROM Employee emp)",
+                Employee.class).getSingleResult();
+    }
+
+    /**
+     * Esta sendo Criando Localmente a Query com o IN
+     * Me dê a lista de Employee com Endereço que vivem IN(.....)
+     */
+    public Collection<Employee> filterEmployeeByState() {
+        return entityManager
+                .createQuery("SELECT e FROM Employee e WHERE e.address.state IN ('ALMADA', 'SETÚBAL')", Employee.class)
+                .getResultList();
+    }
+
+    /**
+     * Esta sendo Criando Localmente a Query com o NOT IN
+     * Me dê a lista de Employee com Endereço que NÃO vivem IN(.....)
+     */
+    public Collection<Employee> filterEmployeeByStateNotIn() {
+        return entityManager.createQuery("SELECT e FROM Employee e WHERE e.address.state NOT IN ('ALMADA', 'SETÚBAL')",
+                Employee.class).getResultList();
+    }
+
+    /**
+     * Esta sendo Criando Localmente a Query com o IS EMPTY
+     * Me dê a lista de Employee com e seu Subordinados que NÃO TEM VALORES
+     * NULOS(.....)
+     */
+    public Collection<Employee> getManagers() {
+        return entityManager.createQuery("SELECT e FROM Employee e WHERE e.subordinates IS NOT EMPTY", Employee.class)
+                .getResultList();
+    }
+
+    /**
+     * Esta sendo Criando Localmente a Query com o MEMBER OF , ou seja ENTIDADE com
+     * relacionamento de Class
+     * Member OF tem que receber um PARAMENTRO que é um Atributo do tipo
+     * RELACIONAMENTO. :project MEMBER OF e.projects
+     */
+    public Collection<Employee> getEmployeesByProject(Project project) {
+        return entityManager.createQuery("SELECT e FROM Employee e WHERE :project MEMBER OF e.projects", Employee.class)
+                .setParameter("project", project).getResultList();
+    }
+
+    /**
+     * Esta sendo Criando Localmente a Query com o AND, ANY , ALL
+     * o AND é para LIGAÇÃO entre 2 condições Ex:e.basicSalary < ALL(SELECT
+     * s.basicSalary FROM e.suborddinates s )
+     * o FROM aqui substitui do JOIN.
+     * o ALL vai pegar TUDO que tem na SubQuery e comparar com a VAR e.basicSalary
+     * o ANY vai pegar ALGUNS e comparar 1 por 1 com a Var e.basicSalary
+     */
+    public Collection<Employee> getAllLowerPaidManagers() {
+        return entityManager.createQuery(
+                "SELECT e FROM Employee e WHERE e.subordinates IS NOT EMPTY AND e.basicSalary < ALL(SELECT s.basicSalary FROM e.subordinates s )",
+                Employee.class).getResultList();
+    }
+
+    /**
+     * Esta sendo Criando Localmente a Query com ORDER BY UP or DESC
+     * tem a ver com a Ordem, crescente ou descrecente,
+     * OBS: UP é o default, n precisa por
+     */
+    public Collection<Employee> getEmployeesByProjectOrdeBy(Project project) {
+        return entityManager.createQuery(
+                "SELECT e FROM Employee e WHERE :project MEMBER OF e.projects ORDER BY e.department.departmentName DESC",
+                Employee.class)
+                .setParameter("project", project).getResultList();
+    }
+
+    /**
+     * Esta sendo Criando Localmente a Query SUM() são postos ANTES do FROM
+     * SUM é uma Função que execulta uma SOMA
+     */
+    public Collection<Object[]> getTotalEmployeeSalariesByDept() {
+        TypedQuery<Object[]> query = entityManager.createQuery(
+                "SELECT d.departmentName, SUM(e.basicSalary) FROM Department d JOIN d.employees e GROUP BY d.departmentName",
+                Object[].class);
+        return query.getResultList();
+    }
+
+    /**
+     * Esta sendo Criando Localmente a Query AVERAGE() são postos ANTES do FROM
+     * SUM é uma Função que execulta uma SOMA
+     */
+    public Collection<Object[]> getAverageEmployeeByDepart() {
+        TypedQuery<Object[]> query = entityManager.createQuery(
+                "SELECT d.departmentName AVG(e.basicSalary) FROM Department d JOIN d.employees e WHERE e.subordinates IS EMPTY GROUP BY d.departmentName",
+                Object[].class);
+        return query.getResultList();
+    }
+
+    /**
+     * Esta sendo Criando Localmente a Query COUNT() são postos ANTES do FROM
+     * SUM é uma Função que execulta um contagem em todos os Employee
+     */
+    public Collection<Object[]> countEmployeeByDept() {
+        return entityManager.createQuery(
+                "SELECT d.departmentName COUNT(e) FROM Department d JOIN d.employees e GROUP BY d.departmentName ",
+                Object[].class).getResultList();
+    }
+
+    /**
+     * Esta sendo Criando Localmente a Query MAX() or MIN() são postos ANTES do FROM
+     * SUM é uma Função que execulta um contagem em todos os Employee com MAIORES
+     * salarios e com os MENORES salarios
+     */
+    public Collection<Object[]> countEmployeeLowersByDeptMAX() {
+        return entityManager.createQuery(
+                "SELECT d.departmentName MAX(e.basicSalary) FROM Department d JOIN d.employees e GROUP BY d.departmentName ",
+                Object[].class).getResultList();
+    }
+
+    public Collection<Object[]> countEmployeeLowersByDeptMIN() {
+        return entityManager.createQuery(
+                "SELECT d.departmentName MIN(e.basicSalary) FROM Department d JOIN d.employees e GROUP BY d.departmentName ",
+                Object[].class).getResultList();
+    }
+
+    /**
+     * Esta sendo Criando Localmente a Query AGGREGATE function HAVING, que receberá
+     * um paramentro e lá no retorno poderemos usar uma FUNÇÃO AVG, MAX, MIN ETC
+     * depois do FROM, desta forma SOMENTE 1 resultado é agregado
+     * Ex: HAVING AVG(e.basicSalary) > :minimumThreshold
+     */
+    public Collection<Object[]> getAverageEmployeeByDepartFuncHAVING(BigDecimal minimumThreshold) {
+        TypedQuery<Object[]> query = entityManager.createQuery(
+                "SELECT d.departmentName AVG(e.basicSalary) FROM Department d JOIN d.employees e WHERE e.subordinates IS EMPTY GROUP BY d.departmentName HAVING AVG(e.basicSalary) > :minimumThreshold",
+                Object[].class).setParameter("minimumThreshold", minimumThreshold);
+        return query.getResultList();
     }
 
     /* FindById */

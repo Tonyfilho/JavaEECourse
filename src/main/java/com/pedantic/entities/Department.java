@@ -2,6 +2,8 @@ package com.pedantic.entities;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,8 +47,8 @@ public class Department extends AbstractEntity {
     public static final String FIND_BY_NAME = "Department.findByName";
     public static final String LIST_DEPARTMENTS = "Department.listDepartments";
 
-    @NotEmpty(message = "Department name must be set") /** @NotEmpty é FieldAcess é um Provider de acesso ao campo */
-
+    @NotEmpty(message = "Department name must be set") /** @NotEmpty é FieldAcess é um Provider de acesso ao campo isto é equivalente a uma CONSTRAIN*/
+    @Pattern(regexp = "/*FIN0011MAIN*/", message = "Department must be in the form abreviation Number and Brach Pattern") /**FIN0011MAIN ter que salvar e Verificar se Todos os registro tem este PARTTEN  para o dep financeiro, passando um Expressão regular*/
     private String departmentName;
 
     @OneToMany(mappedBy = "department") /**
