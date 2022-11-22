@@ -267,6 +267,12 @@ public class QueryService {
         return query.getResultList();
     }
 
+    /** Native Query, usamos uma query nativa da DB */
+    @SuppressWarnings("unchecked")
+    public Collection<Department>getDepartmentNativeQuery(){
+        return entityManager.createNativeQuery("SELECT * FROM Department", Department.class).getResultList();
+    }
+
     /* FindById */
     public Department findByIdDepartment(Long id) {
         return entityManager.find(Department.class, id);

@@ -4,6 +4,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
+import com.pedantic.config.AbstractEntityListener;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +40,9 @@ import java.util.List;
 @NamedQuery(name = Department.FIND_BY_NAME, query = "select d from Department d where d.departmentName = :name and d.userEmail = :email")
 @NamedQuery(name = Department.LIST_DEPARTMENTS, query = "select d from Department d where  d.userEmail = :email")
 @Access(AccessType.FIELD)
+
+
+@EntityListeners({AbstractEntityListener.class}) /*Passamos as Class LISTENERs dentro como Objeto o CDI Injetará as Classes LISTENERs aqui */
 public class Department extends AbstractEntity {
 
     public static final String GET_DEPARTMENT_LIST = "Department.getAllDepartments";

@@ -2,6 +2,7 @@ package com.pedantic.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @MappedSuperclass /**Transforma esta class em uma SuperClass e ao ser Extendida em qualquer Outra Classe, faz com que Seja Sobre Escrita em que extendeu, desta forma esta classe que extendeu Não precisa 
 Cria os Atributos que já existente na SuperCLass , que se tornarão colunas da Db de que Extender a SuperClass*/
@@ -16,6 +17,26 @@ public abstract class AbstractEntity implements Serializable {
 
     @Version
     protected Long version;
+    protected LocalDateTime createdOn;
+    protected LocalDateTime updatedOn;
+    
+
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(LocalDateTime createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    public LocalDateTime getUpdatedOn() {
+        return updatedOn;
+    }
+
+    public void setUpdatedOn(LocalDateTime updatedOn) {
+        this.updatedOn = updatedOn;
+    }
+
 
     public Long getVersion() {
         return version;

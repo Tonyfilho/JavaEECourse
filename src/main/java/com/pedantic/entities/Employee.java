@@ -24,6 +24,9 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Size;
 
+import com.pedantic.config.AbstractEntityListener;
+import com.pedantic.config.EmployeeListener;
+
 import javafx.scene.control.PasswordField;
 
 /**
@@ -34,50 +37,52 @@ import javafx.scene.control.PasswordField;
  * LIKE Operator
  */
 
-
-
-
-/**BETWEEN  Operator
+/**
+ * BETWEEN Operator
  * Limitaremos o que virá na QUERY usando Between, combinaremos 2 limitadores
  */
-@NamedQuery(name= Employee.EMPLOYEE_SALARY_BOUND , query = "select e from Employee e WHERE e.basicSalary BETWEEN :lowerBound AND :upperBound")
+@NamedQuery(name = Employee.EMPLOYEE_SALARY_BOUND, query = "select e from Employee e WHERE e.basicSalary BETWEEN :lowerBound AND :upperBound")
 
-
-/**WHERE Clause, são paramentros usados para FILTRAR, são chamado de PARAMITERS 
+/**
+ * WHERE Clause, são paramentros usados para FILTRAR, são chamado de PARAMITERS
  * Ex: " Maior que, Iqual que ...."
- * OBS: ? é aqui um paramentro da NamedQuery, neste caso ? ou podemos passar a propriedade
-*/
-@NamedQuery(name= Employee.GET_WHERE_CLAUSE_EMPLOYEE_PARAMITERS_ALLOWANCES , query = "select distinct al from Employee e join  e.employeeAllowances al WHERE Al.allowance.Amount > :greaterThanValue")
+ * OBS: ? é aqui um paramentro da NamedQuery, neste caso ? ou podemos passar a
+ * propriedade
+ */
+@NamedQuery(name = Employee.GET_WHERE_CLAUSE_EMPLOYEE_PARAMITERS_ALLOWANCES, query = "select distinct al from Employee e join  e.employeeAllowances al WHERE Al.allowance.Amount > :greaterThanValue")
 
-/**Criando NamedQuery com JOIN, e trazendo so que tem em outra Entidade
+/**
+ * Criando NamedQuery com JOIN, e trazendo so que tem em outra Entidade
  * OBS: temos agora 2 Var o E e o AL
  * AllWances é uma SET ou seja uma COLLECTION
- * */ 
-@NamedQuery(name= Employee.EMPLOYEE_CONSTRUCTOR_PROJECTION_SET, query = "select distinct al from Employee e join  e.employeeAllowances al")
+ */
+@NamedQuery(name = Employee.EMPLOYEE_CONSTRUCTOR_PROJECTION_SET, query = "select distinct al from Employee e join  e.employeeAllowances al")
 
 /**
  * Por um MAP um tipo de COLLECTION com KEY e VALUE
- * */ 
-@NamedQuery(name= Employee.EMPLOYEE_CONSTRUCTOR_MAP, query = "select e.fullName, KEY(p), VALUE(p) from Employee e join  e.employeePhoneNumbers p")
+ */
+@NamedQuery(name = Employee.EMPLOYEE_CONSTRUCTOR_MAP, query = "select e.fullName, KEY(p), VALUE(p) from Employee e join  e.employeePhoneNumbers p")
 
-/**Criando NamedQuery para PakingSpace employee relacionamento OneToOne LazyLoad */
+/**
+ * Criando NamedQuery para PakingSpace employee relacionamento OneToOne LazyLoad
+ */
 @NamedQuery(name = Employee.GET_ALL_PARKING_SPACE, query = "select e.getParkingSpace.parkingLotNumber from Employee e")
 
-/**Criando NamedQuery para employee name and Salary, COMBINE EXPRESSION
- * Select: Expression e.fullName, e.basicSalary, isto será uma Coleção Array  de  Objeto, por serem Tipos diferentes, 1º string o 2º BigDecimal
+/**
+ * Criando NamedQuery para employee name and Salary, COMBINE EXPRESSION
+ * Select: Expression e.fullName, e.basicSalary, isto será uma Coleção Array de
+ * Objeto, por serem Tipos diferentes, 1º string o 2º BigDecimal
  */
 @NamedQuery(name = Employee.EMPLOYEE_PROJECTION, query = "select e.fullName, e.basicSalary from Employee e")
 
-/**Criando NamedQuery para employee name and Salary, CONSTRUCTOR   EXPRESSION 
- * temos que passar o nome e caminho da class e o construtor: com.pedantic.entities.EmployeeDetails()
- * Select: Expression e.fullName, e.basicSalary, isto será uma Coleção Array  de  Objeto, por serem Tipos diferentes, 1º string o 2º BigDecimal
+/**
+ * Criando NamedQuery para employee name and Salary, CONSTRUCTOR EXPRESSION
+ * temos que passar o nome e caminho da class e o construtor:
+ * com.pedantic.entities.EmployeeDetails()
+ * Select: Expression e.fullName, e.basicSalary, isto será uma Coleção Array de
+ * Objeto, por serem Tipos diferentes, 1º string o 2º BigDecimal
  */
-@NamedQuery(name = Employee.EMPLOYEE_CONSTRUCTOR_PROJECTION, query ="select new com.pedantic.entities.EmployeeDetails(e.fullName, e.basicSalary, e.department.departmentName) from Employee e")
-
-
-
-
-
+@NamedQuery(name = Employee.EMPLOYEE_CONSTRUCTOR_PROJECTION, query = "select new com.pedantic.entities.EmployeeDetails(e.fullName, e.basicSalary, e.department.departmentName) from Employee e")
 
 @NamedQuery(name = Employee.FIND_BY_ID, query = "select e from Employee e where e.id = :id and e.userEmail = :email")
 @NamedQuery(name = Employee.FIND_BY_NAME, query = "select e from Employee e where e.fullName = :name and e.userEmail = :email")
@@ -85,38 +90,45 @@ import javafx.scene.control.PasswordField;
 @NamedQuery(name = Employee.FIND_PAST_PAYSLIP_BY_ID, query = "select p from Employee e join e.pastPayslips p where e.id = :employeeId and e.userEmail =:email and p.id =:payslipId and p.userEmail = :email")
 @NamedQuery(name = Employee.GET_PAST_PAYSLIPS, query = "select p from Employee e inner join e.pastPayslips p where e.id = :employeeId and e.userEmail=:email")
 @Table(name = "Employee", schema = "HR") /** A Table @notation para Mapear a relação da Tabela da DB com a sua ENTITY */
+
+
+@EntityListeners({EmployeeListener.class, AbstractEntityListener.class}) /*Passamos as Class LISTENERs dentro como Objeto */
 public class Employee extends AbstractEntity {
-    /**Os Nomes das Querys */
+    /** Os Nomes das Querys */
     public static final String FIND_BY_ID = "Employee.findById";
     public static final String FIND_BY_NAME = "Employee.findByName";
     public static final String LIST_EMPLOYEES = "Employee.listEmployees";
     public static final String FIND_PAST_PAYSLIP_BY_ID = "Employee.findPastPayslipById";
     public static final String GET_PAST_PAYSLIPS = "Employee.getPastPayslips";
-    /**Criando NamedQuery para PakingSpace employee relacionamento OneToOne LazyLoad */
+    /**
+     * Criando NamedQuery para PakingSpace employee relacionamento OneToOne LazyLoad
+     */
     public static final String GET_ALL_PARKING_SPACE = "Employee.getAllParkingSpaces";
-    /**Criando NamedQuery para employee name and Salary */
-    public static final String EMPLOYEE_PROJECTION = "Employee.nameAndSalaryProjection";    
-    /**Criando NamedQuery para employee name and Salary  and Department */
+    /** Criando NamedQuery para employee name and Salary */
+    public static final String EMPLOYEE_PROJECTION = "Employee.nameAndSalaryProjection";
+    /** Criando NamedQuery para employee name and Salary and Department */
     public static final String EMPLOYEE_CONSTRUCTOR_PROJECTION = "Employee.nameAndSalaryAndDepartmentNameProjection";
-    /**Criando NamedQuery para employee name and Salary  and Department Usando COLLECTION SET */
+    /**
+     * Criando NamedQuery para employee name and Salary and Department Usando
+     * COLLECTION SET
+     */
     public static final String EMPLOYEE_CONSTRUCTOR_PROJECTION_SET = "Employee.nameAndSalaryAndDepartmentNameProjection";
-    /**Criando NamedQuery para employee name and Salary  and Department Usando COLLECTION MAP */
-    public static final String EMPLOYEE_CONSTRUCTOR_MAP = "Employee.mapEmployee";   
-    /**Criando NamedQuery WHERE com PARAMITERS*/
+    /**
+     * Criando NamedQuery para employee name and Salary and Department Usando
+     * COLLECTION MAP
+     */
+    public static final String EMPLOYEE_CONSTRUCTOR_MAP = "Employee.mapEmployee";
+    /** Criando NamedQuery WHERE com PARAMITERS */
     public static final String GET_WHERE_CLAUSE_EMPLOYEE_PARAMITERS_ALLOWANCES = "Employee.getAllowances";
     /** NamedQuery com limitadores */
     public static final String EMPLOYEE_SALARY_BOUND = "EmployeeSalaryBound";
-
-    
-
-
 
     @NotEmpty(message = "Name cannot be empty")
     @Basic /**
             * Esta anotação para ser Mapeada na DB como do tipo BASIC, Ex: Tipo: Long,
             * String, Int , ela é OPCIONAL pois já é Default
             */
-    @Size( min = 6, max = 40 ,message = "Min Size Name is 6 caracters") /**Pode ser usando com Maximo e Minimo */
+    @Size(min = 6, max = 40, message = "Min Size Name is 6 caracters") /** Pode ser usando com Maximo e Minimo */
     private String fullName;
 
     @Past(message = "Date of birth must be in the past")
@@ -145,12 +157,16 @@ public class Employee extends AbstractEntity {
 
     @ElementCollection /*
                         * Esta é a forma de Map uma collection em uma Entidade, com isto é criado uma
-                        * segunda tabela a primarykey de Employee será uma referencia do  objeto em forma de foreingKey.
+                        * segunda tabela a primarykey de Employee será uma referencia do objeto em
+                        * forma de foreingKey.
                         */
-     @CollectionTable(name = "QUALIFICATION", joinColumns =  @JoinColumn(name = "EMP_ID "))/* Custamizando a Collection table com nomes da tabela */
+    @CollectionTable(name = "QUALIFICATION", joinColumns = @JoinColumn(name = "EMP_ID ")) /*
+                                                                                           * Custamizando a Collection
+                                                                                           * table com nomes da tabela
+                                                                                           */
     private Collection<Qualifications> qualifications = new ArrayList<>();
-   
-    @DecimalMax(value = "70") /**Com esta anotação, não permitirar intrudução de Numeros maiores de 70 */
+
+    @DecimalMax(value = "70") /** Com esta anotação, não permitirar intrudução de Numeros maiores de 70 */
     private int age;
 
     @OneToMany /**
@@ -173,36 +189,103 @@ public class Employee extends AbstractEntity {
                                               * Tabela PAYSLIP criar 1 item, teremos 1 Registro dentro de
                                               * Employee.CurrentPayslip,
                                               */
-    private Payslip currentPayslip ;
+    private Payslip currentPayslip;
 
-    @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST , CascadeType.REMOVE}) /**
-                                                              * 1 Instancia de Employee tem relação com 1 instancia de
-                                                              * Payslip, mas agora
-                                                              * será Bidirecional, temos uma Foreingkey de ParkingSpace
-                                                              * em Employee E uma
-                                                              * ForeingKey de Employee em ParkingSpace, pois lá na
-                                                              * entidade ParkingSpace
-                                                              * teremos a @notação @OneToOne TB.
-                                                              * fetch = FetchType.LAZY estou dizendo q o FETCH é LAZY,
-                                                              * só irá buscar quando houver um Resquest
-                                                              * este já o DEFAULT, quando não é informado.
-                                                              * cascade = CascadeType.PERSIST que dizer, q tudo neste relacionamento OnetoOne será cascateado
-                                                              * para ParkingSpace, este o conceito de  CASCADE
-                                                              */
+    @OneToOne(mappedBy = "employee", fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.REMOVE }) /**
+                                                                                                                     * 1
+                                                                                                                     * Instancia
+                                                                                                                     * de
+                                                                                                                     * Employee
+                                                                                                                     * tem
+                                                                                                                     * relação
+                                                                                                                     * com
+                                                                                                                     * 1
+                                                                                                                     * instancia
+                                                                                                                     * de
+                                                                                                                     * Payslip,
+                                                                                                                     * mas
+                                                                                                                     * agora
+                                                                                                                     * será
+                                                                                                                     * Bidirecional,
+                                                                                                                     * temos
+                                                                                                                     * uma
+                                                                                                                     * Foreingkey
+                                                                                                                     * de
+                                                                                                                     * ParkingSpace
+                                                                                                                     * em
+                                                                                                                     * Employee
+                                                                                                                     * E
+                                                                                                                     * uma
+                                                                                                                     * ForeingKey
+                                                                                                                     * de
+                                                                                                                     * Employee
+                                                                                                                     * em
+                                                                                                                     * ParkingSpace,
+                                                                                                                     * pois
+                                                                                                                     * lá
+                                                                                                                     * na
+                                                                                                                     * entidade
+                                                                                                                     * ParkingSpace
+                                                                                                                     * teremos
+                                                                                                                     * a @notação @OneToOne
+                                                                                                                     * TB.
+                                                                                                                     * fetch
+                                                                                                                     * =
+                                                                                                                     * FetchType.LAZY
+                                                                                                                     * estou
+                                                                                                                     * dizendo
+                                                                                                                     * q
+                                                                                                                     * o
+                                                                                                                     * FETCH
+                                                                                                                     * é
+                                                                                                                     * LAZY,
+                                                                                                                     * só
+                                                                                                                     * irá
+                                                                                                                     * buscar
+                                                                                                                     * quando
+                                                                                                                     * houver
+                                                                                                                     * um
+                                                                                                                     * Resquest
+                                                                                                                     * este
+                                                                                                                     * já
+                                                                                                                     * o
+                                                                                                                     * DEFAULT,
+                                                                                                                     * quando
+                                                                                                                     * não
+                                                                                                                     * é
+                                                                                                                     * informado.
+                                                                                                                     * cascade
+                                                                                                                     * =
+                                                                                                                     * CascadeType.PERSIST
+                                                                                                                     * que
+                                                                                                                     * dizer,
+                                                                                                                     * q
+                                                                                                                     * tudo
+                                                                                                                     * neste
+                                                                                                                     * relacionamento
+                                                                                                                     * OnetoOne
+                                                                                                                     * será
+                                                                                                                     * cascateado
+                                                                                                                     * para
+                                                                                                                     * ParkingSpace,
+                                                                                                                     * este
+                                                                                                                     * o
+                                                                                                                     * conceito
+                                                                                                                     * de
+                                                                                                                     * CASCADE
+                                                                                                                     */
     private ParkingSpace parkingSpace;
 
     @OneToMany // todas as relações existem o conceito de CASCADE
     private Collection<Payslip> pastPayslips = new ArrayList<>();
 
-
-    @ElementCollection /**Todo Map ja recebe por DEFAULT esta @anotação, mesmo que não declarada */
+    @ElementCollection /** Todo Map ja recebe por DEFAULT esta @anotação, mesmo que não declarada */
     @CollectionTable(name = "EMP_PHONE_NUMBERS")
     @MapKeyColumn(name = "PHONE_TYPE")
     @Column(name = "PHONE_NUMBER")
     @MapKeyEnumerated(EnumType.STRING)
-    private Map<PhoneType,String> employeePhoneMumbers = new HashMap<>(); /**O Map precisa ter 2 argumentos, a KEY e Objeto */
-
-
+    private Map<PhoneType, String> employeePhoneMumbers = new HashMap<>();
+    /** O Map precisa ter 2 argumentos, a KEY e Objeto */
 
     @ManyToOne /**
                 * Esta @anotação diz: Envio Muitas instancia de Employee serão enviados
@@ -227,32 +310,31 @@ public class Employee extends AbstractEntity {
     @Lob
     private byte[] picture;
 
-    @PrePersist /** São LIFECYCLEs com funcões de CALLBACKs
-    * @PostPersist
-    * @PreUpdate
-    * @PostUpdate
-    * @PostLoad
-    * Que diz para este campo ser persistido na DB
-    * no RunTime este Metodo ser Pre Percistido na DB
-    */
-    @PostPersist
-    @PreUpdate
-    @PostUpdate
-    @PostLoad
-    private void init() {
-        this.age = Period.between(dateOfBirth, LocalDate.now()).getYears();
-    }
-
+    /** foi criando um Classe chamada EmployeeLister que substitui este metodo
+     * é necessario por a @notação @EntityListernes() para que CDI injete ela no Employee Entity
+     * @PrePersist São LIFECYCLEs com funcões de CALLBACKs
+     * @PostPersist
+     * @PreUpdate
+     * @PostUpdate
+     * @PostLoad
+     *           Que diz para este campo ser persistido na DB
+     *           no RunTime este Metodo ser Pre Percistido na DB
+     * 
+     * 
+     *           private void init() {
+     *           this.age = Period.between(dateOfBirth, LocalDate.now()).getYears();
+     *           }
+     */
     /***************************************** GETs and SETs *************** */
 
+    public void setAge(int age) {
+        this.age = age;
+    }
 
-    
-
-    
     public Map<PhoneType, String> getEmployeePhoneMumbers() {
         return employeePhoneMumbers;
     }
-    
+
     public void setEmployeePhoneMumbers(Map<PhoneType, String> employeePhoneMumbers) {
         this.employeePhoneMumbers = employeePhoneMumbers;
     }
