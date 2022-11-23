@@ -3,18 +3,28 @@ package com.pedantic.resources;
 
 import javafx.scene.media.MediaPlayer;
 
-import javax.inject.Inject;
+
+import javax.security.auth.message.callback.PrivateKeyCallback.Request;
 import javax.ws.rs.*;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 
 import com.pedantic.entities.Employee;
 import com.pedantic.service.PersistenceService;
 import com.pedantic.service.QueryService;
 
+
+
+import javax.inject.Inject;
+import javax.validation.Valid;
 import java.net.URI;
-import java.util.Collection;
+import java.util.UUID;
+
 
 @Path("employees") //api/v1/employees/*
 @Produces("application/json")
@@ -44,7 +54,7 @@ public class EmployeeResource {
     @GET //api/v1/employees GET Request
     @Path("employees") //api/v1/employees/employees
 //    @Produces("application/xml")
-    public Response getEmployees() {
+    public Response getEmployees(@Context HttpHeaders httpHeaders) {
 
 //        Collection<Employee> employees = new ArrayList<>();
 //
@@ -65,17 +75,37 @@ public class EmployeeResource {
 //
 //        employees.add(employee);
 //        employees.add(employee1);
+        MediaType mediaType = httpHeaders.getAcceptableMediaTypes().get(0);
 
-        return Response.ok(queryService.getEmployees()).status(Response.Status.OK).build();
+        return Response.ok(queryService.getEmployees(), mediaType).status(Response.Status.OK).build();
 
 //        return employees;
     }
 
     @GET
     @Path("employees/{id: \\d+}") //api/v1/employees/employee/1  GET Method {username: }@{domain: }.{company}
-    public Response getEmployeeById(@PathParam("id") @DefaultValue("0") Long id) {
+    public Response getEmployeeById(@PathParam("id") @DefaultValue("0") Long id, @Context Request request) {
+        Employee employee = queryService.findEmployeeById(id);
 
-        return Response.ok(queryService.findEmployeeById(id)).status(Response.Status.OK).build();
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setMaxAge(1000);
+
+        EntityTag entityTag = new EntityTag(UUID.randomUUID().toString());
+
+        // Response.ResponseBuilder responseBuilder = request.evaluatePreconditions();
+        Response.ResponseBuilder responseBuilder = null;
+
+        if (responseBuilder != null) {
+            responseBuilder.cacheControl(cacheControl);
+            return responseBuilder.build();
+
+        }
+        responseBuilder = Response.ok(employee);
+        responseBuilder.tag(entityTag);
+        responseBuilder.cacheControl(cacheControl);
+        return responseBuilder.build();
+
+//        return Response.ok().status(Response.Status.OK).build();
     }
 
     @GET
@@ -89,8 +119,8 @@ public class EmployeeResource {
     @POST //api/v1/employees POST Request
     @Path("employees") //api/v1/employees/new - POST Request
 //    @Consumes("application/xml")
-    public Response createEmployee(Employee employee) {
-        persistenceService.saveEmployee(employee, employee.getParkingSpace());
+    public Response createEmployee(@Valid  Employee employee) {
+        persistenceService.saveEmployee(employee, null);
 
         URI uri = uriInfo.getAbsolutePathBuilder().path(employee.getId().toString()).build();
         return Response.created(uri).status(Response.Status.CREATED).build();
