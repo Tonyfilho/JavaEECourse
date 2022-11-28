@@ -52,12 +52,26 @@ public class PersistenceService {
      * CascadeType.PERSIST), por causa deste CasdadeType.PERSIST, ja não preciso me
      * preocupar com a relação da DB Employee com ParkingSpace
      */
-    public void saveEmployee(Employee employee, ParkingSpace parkingSpace) {
-         employee.setParkingSpace(parkingSpace);
-         entityManager.persist(employee);
+    public void saveEmployeeWithParkingSpace(Employee employee, ParkingSpace parkingSpace) {
+        employee.setParkingSpace(parkingSpace);
+        entityManager.persist(employee);
     }
 
     public void updateDepartment(Department department) {
         entityManager.merge(department);
     }
+
+    /**
+     * Se não existe um Employee ele Persiste ou seja SALVA,
+     * Caso ja exista, ele faz o MERGE ou seja o Update
+     */
+    public void saveEmployee(Employee employee) {
+        if (employee.getId() == null) {
+            entityManager.persist(employee);
+        } else {
+            entityManager.merge(employee);
+
+        }
+    }
+
 }
